@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
 from models import db, User
-<<<<<<< HEAD
 from flask_jwt_extended import JWTManager
 
 
