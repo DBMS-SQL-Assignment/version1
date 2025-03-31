@@ -1,41 +1,51 @@
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from flask_bcrypt import Bcrypt
-from flask_login import login_user, logout_user
 from app import app, db
 from models import User
+from forms import RegisterForm, LoginForm
 
 bcrypt = Bcrypt(app)
 
 # Register User (POST /api/register)
 @app.route("/api/register", methods=["POST"])
 def register():
-    data = request.json
-    hashed_password = bcrypt.generate_password_hash(data["password"]).decode("utf-8")
-    
-    new_user = User(username=data["username"], password=hashed_password, role=data["role"])
-    db.session.add(new_user)
-    db.session.commit()
-    
-    return jsonify({"message": "Done"}), 201
+    form = RegisterForm(data=request.json)  # Ensure we pass JSON data
 
-# Login User (POST /api/login)
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            return jsonify({"message": "Username already taken"}), 400  # Bad Request
+
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+        new_user = User(username=form.username.data, password=hashed_password, role=form.role.data)
+        db.session.add(new_user)
+        db.session.commit()
+        
+        return jsonify({"message": "Registration successful"}), 201
+    else:
+        return jsonify({"errors": form.errors}), 400  # Return validation errors
+
 @app.route("/api/login", methods=["POST"])
 def login():
-    data = request.json
-    user = User.query.filter_by(username=data["username"]).first()
-    
-    if user and bcrypt.check_password_hash(user.password, data["password"]):
-        access_token = create_access_token(identity={"username": user.username, "role": user.role})
-        return jsonify({"token": access_token, "role": user.role}), 200
-    
-    return jsonify({"message": "Invalid"}), 401
+    form = LoginForm(data=request.json)  # Pass JSON data to Flask-WTF form
+
+    if form.validate_on_submit():  # Validate input fields
+        user = User.query.filter_by(username=form.username.data).first()
+        
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            access_token = create_access_token(identity={"username": user.username, "role": user.role})
+            return jsonify({"token": access_token}), 200  # Successful login
+
+        return jsonify({"message": "Invalid username or password"}), 401  # Unauthorized
+    else:
+        return jsonify({"errors": form.errors}), 400  # Return validation errors
 
 # Logout User (POST /api/logout)
 @app.route("/api/logout", methods=["POST"])
 @jwt_required()
 def logout():
-    logout_user()
+    #"Delete the JWT token in Frontend"
     return jsonify({"message": "Done"}), 200
 
 # Dashboard with Role-Based Access (GET /api/dashboard)
@@ -44,8 +54,4 @@ def logout():
 def dashboard():
     current_user = get_jwt_identity()
     role = current_user["role"]
-    
-    if role == "Professor" or role == "Student" or role == "Assistant":
-        return jsonify({"role": role}), 200
-    else:
-        return jsonify({"role": "Unauthorized"}), 403
+    return jsonify({"role": role}), 200
