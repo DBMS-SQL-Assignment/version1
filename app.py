@@ -5,19 +5,15 @@ from config import Config
 from models import db, User
 <<<<<<< HEAD
 from flask_jwt_extended import JWTManager
-=======
->>>>>>> e542fb22b4fc97aa95d94e125a5ce237175610ea
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
 
-<<<<<<< HEAD
 jwt = JWTManager(app)
 
-=======
->>>>>>> e542fb22b4fc97aa95d94e125a5ce237175610ea
 # Flask-Login Configuration
 login_manager = LoginManager()
 login_manager.init_app(app)
