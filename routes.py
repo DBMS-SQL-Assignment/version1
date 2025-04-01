@@ -18,7 +18,7 @@ def register():
             return jsonify({"message": "Username already taken"}), 400  # Bad Request
 
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-        new_user = User(username=form.username.data, password=hashed_password, role=form.role.data)
+        new_user = User(username=form.username.data, password=hashed_password, role=form.role.data.lower())
         db.session.add(new_user)
         db.session.commit()
         
