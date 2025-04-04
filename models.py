@@ -92,3 +92,4 @@ class GradeMark(db.Model):
 
     def __repr__(self):
         return f"<GradeMark(user_id={self.user_id}, subject_id={self.subject_id}, grade={self.grade})>"
+
