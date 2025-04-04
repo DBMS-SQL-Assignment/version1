@@ -1,7 +1,7 @@
 class Config:
-    SECRET_KEY = "your_jwt_secret"
+    SECRET_KEY = "c21fd32706b46cc4b0c028b14a888f87e7a8bcbfa13d28c37b83f7e98d82f6d5"
     WTF_CSRF_ENABLED = False
-    SJWT_SECRET_KEY = "your_jwt_secret"
+    SJWT_SECRET_KEY = "c21fd32706b46cc4b0c028b14a888f87e7a8bcbfa13d28c37b83f7e98d82f6d5"
     JWT_ACCESS_TOKEN_EXPIRES = 3600 
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:97082@localhost/IIITK"
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:Anjudk92@localhost/IIITK"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
