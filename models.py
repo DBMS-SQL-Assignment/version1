@@ -10,3 +10,7 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User {self.username} - Role: {self.role}>"
+
+class Subject(db.Model):
+    subject_id = db.Column(db.Integer, primary_key=True)
+    subject_name = db.Column(db.String(255), unique=True, nullable=False)
