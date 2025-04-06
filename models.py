@@ -22,29 +22,44 @@ class Student(db.Model):
     __tablename__ = 'students'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    branch = db.Column(db.String(100), nullable=False)
+    student_regno = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    department = db.Column(db.String(100), nullable=False)
 
     user = db.relationship('User', back_populates='student')
     student_courses = db.relationship('StudentCourse', back_populates='student', cascade="all, delete-orphan")
     attendance_records = db.relationship('AttendanceMark', back_populates='student', cascade="all, delete-orphan")
     grade_records = db.relationship('GradeMark', back_populates='student', cascade="all, delete-orphan")
 
+    def __repr__(self):
+        return f"<Student {self.name} ({self.student_regno})>"
+
 class Professor(db.Model):
     __tablename__ = 'professors'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    prof_id = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
 
     user = db.relationship('User', back_populates='professor')
     professor_courses = db.relationship('ProfessorCourse', back_populates='professor', cascade="all, delete-orphan")
 
+    def __repr__(self):
+        return f"<Professor {self.name} ({self.prof_id})>"
+
 class Assistant(db.Model):
     __tablename__ = 'assistants'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    assigned_to = db.Column(db.String(100), nullable=True)  # Optional field for reference
+    ass_id = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    department = db.Column(db.String(100), nullable=False)
 
     user = db.relationship('User', back_populates='assistant')
+
+    def __repr__(self):
+        return f"<Assistant {self.name} ({self.ass_id})>"
 
 class Subject(db.Model):
     __tablename__ = 'subjects'
