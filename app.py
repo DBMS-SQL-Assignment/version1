@@ -1,7 +1,6 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from models import db, User
+from models import db
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
