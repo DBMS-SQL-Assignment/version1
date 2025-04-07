@@ -46,4 +46,32 @@ def fetch_students_in_subject_func():
     if current_user["role"]=="professor":
         return fetch_students_in_subject()
     return jsonify({"error": "Unauthorized"}), 403
+
     
+# Student Routes
+@app.route("/api/student/courses", methods=["GET"])
+@jwt_required()
+def get_student_courses_func():
+    current_user = get_jwt_identity()
+    if current_user["role"] == "student":
+        student = Student.query.filter_by(id=current_user["id"]).first()
+        return get_student_courses(student)
+    return jsonify({"error": "Unauthorized"}), 403
+
+@app.route("/api/student/attendance", methods=["GET"])
+@jwt_required()
+def get_student_attendance_func():
+    current_user = get_jwt_identity()
+    if current_user["role"] == "student":
+        student = Student.query.filter_by(id=current_user["id"]).first()
+        return get_student_attendance(student)
+    return jsonify({"error": "Unauthorized"}), 403
+
+@app.route("/api/student/grades", methods=["GET"])
+@jwt_required()
+def get_student_grades_func():
+    current_user = get_jwt_identity()
+    if current_user["role"] == "student":
+        student = Student.query.filter_by(id=current_user["id"]).first()
+        return get_student_grades(student)
+    return jsonify({"error": "Unauthorized"}), 403
