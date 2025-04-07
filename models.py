@@ -22,7 +22,8 @@ class Student(db.Model):
     __tablename__ = 'students'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    student_regno = db.Column(db.String(20), unique=True, nullable=False)
+    reg_no = db.Column(db.Integer, unique=True, nullable=False)
+    roll_no = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
 
@@ -32,7 +33,7 @@ class Student(db.Model):
     grade_records = db.relationship('GradeMark', back_populates='student', cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<Student {self.name} ({self.student_regno})>"
+        return f"<Student {self.name} ({self.reg_no})>"
 
 class Professor(db.Model):
     __tablename__ = 'professors'
@@ -52,14 +53,14 @@ class Assistant(db.Model):
     __tablename__ = 'assistants'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    ass_id = db.Column(db.String(20), unique=True, nullable=False)
+    asst_id = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
 
     user = db.relationship('User', back_populates='assistant')
 
     def __repr__(self):
-        return f"<Assistant {self.name} ({self.ass_id})>"
+        return f"<Assistant {self.name} ({self.asst_id})>"
 
 class Subject(db.Model):
     __tablename__ = 'subjects'
