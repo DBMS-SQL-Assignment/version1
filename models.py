@@ -44,6 +44,7 @@ class Professor(db.Model):
 
     user = db.relationship('User', back_populates='professor')
     professor_courses = db.relationship('ProfessorCourse', back_populates='professor', cascade="all, delete-orphan")
+    timetable_entries = db.relationship('Timetable', back_populates='professor', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Professor {self.name} ({self.prof_id})>"
@@ -71,6 +72,7 @@ class Subject(db.Model):
     professor_courses = db.relationship('ProfessorCourse', back_populates='subject', cascade="all, delete-orphan")
     attendance_records = db.relationship('AttendanceMark', back_populates='subject', cascade="all, delete-orphan")
     grade_records = db.relationship('GradeMark', back_populates='subject', cascade="all, delete-orphan")
+    timetable_entries = db.relationship('Timetable', back_populates='subject', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Subject {self.name}>"
@@ -124,3 +126,19 @@ class GradeMark(db.Model):
 
     def __repr__(self):
         return f"<GradeMark(student_id={self.student_id}, subject_id={self.subject_id}, grade={self.grade})>"
+
+class Timetable(db.Model):
+    __tablename__ = 'timetables'
+
+    id = db.Column(db.Integer, primary_key=True)
+    professor_id = db.Column(db.Integer, db.ForeignKey('professors.id', ondelete="CASCADE"), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
+    day_of_week = db.Column(db.String(10), nullable=False)  # e.g., Monday, Tuesday
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+
+    professor = db.relationship('Professor', back_populates='timetable_entries')
+    subject = db.relationship('Subject', back_populates='timetable_entries')
+
+    def __repr__(self):
+        return f"<Timetable(professor_id={self.professor_id}, subject_id={self.subject_id}, {self.day_of_week} {self.start_time}-{self.end_time})>"
