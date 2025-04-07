@@ -55,13 +55,6 @@ def mark_attendance_func():
         return mark_attendance()
     return jsonify({"error": "Unauthorized"}), 403
 
-@app.route("/api/mark_attendance", methods=["POST"])
-@jwt_required()
-def mark_attendance_func():
-    current_user = get_jwt_identity()
-    if current_user["role"]=="professor":
-        return mark_attendance()
-    return jsonify({"error": "Unauthorized"}), 403
 
 @app.route("/api/mark_grade", methods=["POST"])
 @jwt_required()

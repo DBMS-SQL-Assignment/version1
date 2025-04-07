@@ -133,7 +133,7 @@ class Timetable(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     professor_id = db.Column(db.Integer, db.ForeignKey('professors.id', ondelete="CASCADE"), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
+    subject_id = db.Column(db.String(50), db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
     day_of_week = db.Column(db.String(10), nullable=False)  # e.g., Monday, Tuesday
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
