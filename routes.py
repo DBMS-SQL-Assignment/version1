@@ -46,4 +46,28 @@ def fetch_students_in_subject_func():
     if current_user["role"]=="professor":
         return fetch_students_in_subject()
     return jsonify({"error": "Unauthorized"}), 403
+
+@app.route("/api/mark_attendance", methods=["POST"])
+@jwt_required()
+def mark_attendance_func():
+    current_user = get_jwt_identity()
+    if current_user["role"]=="professor":
+        return mark_attendance()
+    return jsonify({"error": "Unauthorized"}), 403
+
+@app.route("/api/mark_attendance", methods=["POST"])
+@jwt_required()
+def mark_attendance_func():
+    current_user = get_jwt_identity()
+    if current_user["role"]=="professor":
+        return mark_attendance()
+    return jsonify({"error": "Unauthorized"}), 403
+
+@app.route("/api/mark_grade", methods=["POST"])
+@jwt_required()
+def mark_grade_func():
+    current_user = get_jwt_identity()
+    if current_user["role"]=="professor":
+        return mark_grade()
+    return jsonify({"error": "Unauthorized"}), 403
     

@@ -65,7 +65,7 @@ class Assistant(db.Model):
 class Subject(db.Model):
     __tablename__ = 'subjects'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(50), primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
     student_courses = db.relationship('StudentCourse', back_populates='subject', cascade="all, delete-orphan")
