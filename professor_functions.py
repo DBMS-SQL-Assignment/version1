@@ -34,19 +34,19 @@ def fetch_students_in_subject():
 def mark_attendance():
     data = request.get_json()
     subject_id = data.get("subject_id")
-    student_ids = data.get("student_ids")
+    reg_nos = data.get("reg_nos")
 
-    if not subject_id or not isinstance(student_ids, list):
+    if not subject_id or not isinstance(reg_nos, list):
         return jsonify({"error": "Invalid data format"}), 400
 
-    for student_id in student_ids:
-        attendance = AttendanceMark.query.filter_by(student_id=student_id, subject_id=subject_id).first()
+    for reg_no in reg_nos:
+        attendance = AttendanceMark.query.filter_by(reg_no=reg_no, subject_id=subject_id).first()
 
         if attendance:
             attendance.attendance_count += 1
         else:
             # Create a new attendance record if not exists
-            new_attendance = AttendanceMark(student_id=student_id, subject_id=subject_id, attendance_count=1)
+            new_attendance = AttendanceMark(reg_no=reg_no, subject_id=subject_id, attendance_count=1)
             db.session.add(new_attendance)
 
     db.session.commit()
@@ -61,20 +61,20 @@ def mark_grade():
         return jsonify({"error": "subject_id and grades are required"}), 400
 
     for entry in grades:
-        student_id = entry.get("student_id")
+        reg_no = entry.get("reg_no")
         grade = entry.get("grade")
 
-        if not student_id or grade is None:
+        if not reg_no or grade is None:
             continue  # Skip invalid entries
 
-        grade_record = GradeMark.query.filter_by(student_id=student_id, subject_id=subject_id).first()
+        grade_record = GradeMark.query.filter_by(reg_no=reg_no, subject_id=subject_id).first()
 
         if grade_record:
             # Update existing grade
             grade_record.grade = grade
         else:
             # Create new grade record
-            new_grade = GradeMark(student_id=student_id, subject_id=subject_id, grade=grade)
+            new_grade = GradeMark(reg_no=reg_no, subject_id=subject_id, grade=grade)
             db.session.add(new_grade)
 
     db.session.commit()

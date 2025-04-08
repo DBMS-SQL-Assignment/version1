@@ -21,7 +21,7 @@ class User(db.Model):
 class Student(db.Model):
     __tablename__ = 'students'
 
-    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
     reg_no = db.Column(db.Integer, unique=True, nullable=False, primary_key=True)
     roll_no = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -38,7 +38,7 @@ class Student(db.Model):
 class Professor(db.Model):
     __tablename__ = 'professors'
 
-    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
     prof_id = db.Column(db.String(20), unique=True, nullable=False, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
@@ -53,7 +53,7 @@ class Professor(db.Model):
 class Assistant(db.Model):
     __tablename__ = 'assistants'
 
-    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
     asst_id = db.Column(db.String(20), unique=True, nullable=False, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
@@ -81,58 +81,58 @@ class Subject(db.Model):
 class StudentCourse(db.Model):
     __tablename__ = 'student_course'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.reg_no', ondelete="CASCADE"), primary_key=True)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
+    reg_no = db.Column(db.Integer, db.ForeignKey('students.reg_no', ondelete="CASCADE"), primary_key=True)
+    subject_id = db.Column(db.String(50), db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
 
     student = db.relationship('Student', back_populates='student_courses')
     subject = db.relationship('Subject', back_populates='student_courses')
 
     def __repr__(self):
-        return f"<StudentCourse(student_id={self.student_id}, subject_id={self.subject_id})>"
+        return f"<StudentCourse(reg_no={self.reg_no}, subject_id={self.subject_id})>"
 
 class ProfessorCourse(db.Model):
     __tablename__ = 'professor_course'
 
-    professor_id = db.Column(db.Integer, db.ForeignKey('professors.prof_id', ondelete="CASCADE"), primary_key=True)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
+    prof_id = db.Column(db.String(20), db.ForeignKey('professors.prof_id', ondelete="CASCADE"), primary_key=True)
+    subject_id = db.Column(db.String(50), db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
 
     professor = db.relationship('Professor', back_populates='professor_courses')
     subject = db.relationship('Subject', back_populates='professor_courses')
 
     def __repr__(self):
-        return f"<ProfessorCourse(professor_id={self.professor_id}, subject_id={self.subject_id})>"
+        return f"<ProfessorCourse(professor_id={self.prof_id}, subject_id={self.subject_id})>"
 
 class AttendanceMark(db.Model): 
     __tablename__ = 'attendance_mark'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.reg_no', ondelete="CASCADE"), primary_key=True)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
+    reg_no = db.Column(db.Integer, db.ForeignKey('students.reg_no', ondelete="CASCADE"), primary_key=True)
+    subject_id = db.Column(db.String(50), db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
     attendance_count = db.Column(db.Integer, nullable=False, default=0)
 
     student = db.relationship('Student', back_populates='attendance_records')
     subject = db.relationship('Subject', back_populates='attendance_records')
 
     def __repr__(self):
-        return f"<AttendanceMark(student_id={self.student_id}, subject_id={self.subject_id}, attendance_count={self.attendance_count})>"
+        return f"<AttendanceMark(student_id={self.reg_no}, subject_id={self.subject_id}, attendance_count={self.attendance_count})>"
 
 class GradeMark(db.Model):
     __tablename__ = 'grade_mark'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.reg_no', ondelete="CASCADE"), primary_key=True)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
+    reg_no = db.Column(db.Integer, db.ForeignKey('students.reg_no', ondelete="CASCADE"), primary_key=True)
+    subject_id = db.Column(db.String(50), db.ForeignKey('subjects.id', ondelete="CASCADE"), primary_key=True)
     grade = db.Column(db.String(10), nullable=False)
 
     student = db.relationship('Student', back_populates='grade_records')
     subject = db.relationship('Subject', back_populates='grade_records')
 
     def __repr__(self):
-        return f"<GradeMark(student_id={self.student_id}, subject_id={self.subject_id}, grade={self.grade})>"
+        return f"<GradeMark(student_id={self.reg_no}, subject_id={self.subject_id}, grade={self.grade})>"
 
 class Timetable(db.Model):
     __tablename__ = 'timetables'
 
     id = db.Column(db.Integer, primary_key=True)
-    professor_id = db.Column(db.Integer, db.ForeignKey('professors.prof_id', ondelete="CASCADE"), nullable=False)
+    prof_id = db.Column(db.String(20), db.ForeignKey('professors.prof_id', ondelete="CASCADE"), nullable=False)
     subject_id = db.Column(db.String(50), db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
     day_of_week = db.Column(db.String(10), nullable=False)  # e.g., Monday, Tuesday
     start_time = db.Column(db.Time, nullable=False)
@@ -142,4 +142,4 @@ class Timetable(db.Model):
     subject = db.relationship('Subject', back_populates='timetable_entries')
 
     def __repr__(self):
-        return f"<Timetable(professor_id={self.professor_id}, subject_id={self.subject_id}, {self.day_of_week} {self.start_time}-{self.end_time})>"
+        return f"<Timetable(professor_id={self.prof_id}, subject_id={self.subject_id}, {self.day_of_week} {self.start_time}-{self.end_time})>"
