@@ -81,6 +81,53 @@ def mark_grade():
     return jsonify({"message": "Grades updated successfully"}), 200
 
 
+def assign_subject(professor):
+    prof_id = professor.prof_id
+    subject_id = request.json.get("subject_id")
+    
+    if not prof_id or not subject_id:
+        return jsonify({"error": "prof_id and subject_id are required"}), 400
+
+    # Check if assignment already exists
+    existing = ProfessorCourse.query.filter_by(prof_id=prof_id, subject_id=subject_id).first()
+
+    if existing:
+        return jsonify({"message": "This course is already assigned to the professor."}), 409  # Conflict
+
+    try:
+        new_assignment = ProfessorCourse(prof_id=prof_id, subject_id=subject_id)
+        db.session.add(new_assignment)
+        db.session.commit()
+        return jsonify({"message": "Course assigned successfully!"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    
+def delete_subject(professor):
+    prof_id = professor.prof_id
+    subject_id = request.json.get("subject_id")
+
+    if not prof_id or not subject_id:
+        return jsonify({"error": "prof_id and subject_id are required"}), 400
+
+    assignment = ProfessorCourse.query.filter_by(prof_id=prof_id, subject_id=subject_id).first()
+
+    if not assignment:
+        return jsonify({"error": "Assignment not found"}), 404
+
+    try:
+        db.session.delete(assignment)
+        db.session.commit()
+        return jsonify({"message": "Assignment deleted successfully."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    
+
+
 
 
 
