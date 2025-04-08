@@ -1,67 +1,46 @@
 from flask import jsonify
-from models import Student, ProfessorCourse
+from models import Student, ProfessorCourse, StudentCourse
 
-def get_student_courses(student):
-    if not student:
-        return jsonify({"error": "Student not found"}), 404
+def fetch_student_courses(student):
+    subjects = [(course.subject.name, course.subject.id) for course in student.student_courses]
+    return jsonify({"subjects": subjects}), 200
 
-    enrolled_info = []
-    for course in student.student_courses:
-        subject = course.subject
-        professor_course = ProfessorCourse.query.filter_by(subject_id=subject.id).first()
-        professor_name = professor_course.professor.name if professor_course else "Not Assigned"
 
-        enrolled_info.append({
-            "subject_id": subject.id,
-            "subject_name": subject.name,
-            "professor_name": professor_name
-        })
-
-    return jsonify({
-        "student_id": student.id,
-        "student_name": student.name,
-        "enrolled_courses": enrolled_info
-    }), 200
-
-def get_student_attendance(student):
-    if not student:
-        return jsonify({"error": "Student not found"}), 404
-
+def fetch_student_attendance_data(student):
     attendance_data = []
+    total_classes = 30  # You might want to make this dynamic based on your system
+    
     for record in student.attendance_records:
         subject = record.subject
-        total_classes = 30 
-        percentage = round((record.attendance_count / total_classes) * 100, 2)
-
+        percentage = (record.attendance_count / total_classes) * 100
+        
         attendance_data.append({
             "subject_id": subject.id,
             "subject_name": subject.name,
             "attendance_count": record.attendance_count,
-            "attendance_percentage": f"{percentage}%"
+            "attendance_percentage": round(percentage, 2)
         })
 
     return jsonify({
-        "student_id": student.id,
+        "student_id": student.reg_no,
         "student_name": student.name,
         "attendance": attendance_data
     }), 200
 
-def get_student_grades(student):
-    if not student:
-        return jsonify({"error": "Student not found"}), 404
-
-    grades_data = []
+def fetch_student_grades_data(student):
+    grades = []
+    
     for record in student.grade_records:
         subject = record.subject
-
-        grades_data.append({
+        grades.append({
             "subject_id": subject.id,
             "subject_name": subject.name,
-            "grade": record.grade
+            "grade": record.grade,
+            "last_updated": record.last_updated.isoformat() if record.last_updated else None
         })
-
+    
     return jsonify({
-        "student_id": student.id,
+        "student_id": student.reg_no,
         "student_name": student.name,
-        "grades": grades_data
+        "grades": grades
     }), 200

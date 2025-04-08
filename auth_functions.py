@@ -6,6 +6,8 @@ from flask import jsonify, request
 from app import app, db
 
 bcrypt = Bcrypt(app)
+hashed = bcrypt.generate_password_hash("123456").decode("utf-8")
+print(hashed)
 
 def register():
     form = RegisterForm(data=request.json)  # Ensure we pass JSON data

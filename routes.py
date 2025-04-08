@@ -1,7 +1,9 @@
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_cors import cross_origin
 from models import *
 from professor_functions import *
+from students_functions import *
 from auth_functions import *
 from dashboard_function import *
 
@@ -65,29 +67,88 @@ def mark_grade_func():
     return jsonify({"error": "Unauthorized"}), 403
     
 # Student Routes
-@app.route("/api/student/courses", methods=["GET"])
-@jwt_required()
-def get_student_courses_func():
-    current_user = get_jwt_identity()
-    if current_user["role"] == "student":
-        student = Student.query.filter_by(id=current_user["id"]).first()
-        return get_student_courses(student)
-    return jsonify({"error": "Unauthorized"}), 403
 
-@app.route("/api/student/attendance", methods=["GET"])
+@app.route("/api/student_courses", methods=["GET"])
 @jwt_required()
-def get_student_attendance_func():
-    current_user = get_jwt_identity()
-    if current_user["role"] == "student":
+@cross_origin(supports_credentials=True, origins=["http://localhost:5173"])
+def get_student_courses():
+    try:
+        current_user = get_jwt_identity()
+        if current_user["role"] != "student":
+            return jsonify({"error": "Forbidden: Student access only"}), 403
+            
         student = Student.query.filter_by(id=current_user["id"]).first()
-        return get_student_attendance(student)
-    return jsonify({"error": "Unauthorized"}), 403
+        if not student:
+            return jsonify({"error": "Student not found"}), 404
 
-@app.route("/api/student/grades", methods=["GET"])
-@jwt_required()
-def get_student_grades_func():
-    current_user = get_jwt_identity()
-    if current_user["role"] == "student":
+        return fetch_student_courses(student)
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/student_attendance", methods=["GET", "OPTIONS"])
+@jwt_required(optional=True)  # Allow OPTIONS without auth
+@cross_origin(supports_credentials=True, 
+             origins="http://localhost:5173",
+             allow_headers=["Authorization", "Content-Type"])
+def get_student_attendance():
+    if request.method == "OPTIONS":
+        return _build_preflight_response()
+    
+    try:
+        current_user = get_jwt_identity()
+        if not current_user or current_user["role"] != "student":
+            return jsonify({"error": "Forbidden: Student access only"}), 403
+
         student = Student.query.filter_by(id=current_user["id"]).first()
-        return get_student_grades(student)
-    return jsonify({"error": "Unauthorized"}), 403
+        if not student:
+            return jsonify({"error": "Student not found"}), 404
+
+        return fetch_student_attendance_data(student)
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+def _build_preflight_response():
+    response = jsonify({"status": "preflight"})
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:5173")
+    response.headers.add("Access-Control-Allow-Headers", "Authorization, Content-Type")
+    response.headers.add("Access-Control-Allow-Methods", "GET, OPTIONS")
+    return response
+
+
+@app.route("/api/student_grades", methods=["GET", "OPTIONS"])
+@jwt_required(optional=True)
+@cross_origin(supports_credentials=True, origins="http://localhost:5173", allow_headers=["Authorization", "Content-Type"])
+def handle_student_grades():
+    if request.method == "OPTIONS":
+        return _build_preflight_response()
+    
+    try:
+        current_user = get_jwt_identity()
+        if not current_user or current_user["role"] != "student":
+            return jsonify({"error": "Forbidden: Student access only"}), 403
+
+        # Get student using user ID from the JWT token
+        student = Student.query.filter_by(id=current_user["id"]).first()
+        if not student:
+            return jsonify({"error": "Student not found"}), 404
+
+        # Fetch grade records through the student relationship
+        grades = []
+        for grade_record in student.grade_records:
+            grades.append({
+                "subject_id": grade_record.subject_id,
+                "subject_name": grade_record.subject.name,
+                "grade": grade_record.grade
+            })
+
+        return jsonify({
+            "student_id": student.reg_no,
+            "student_name": student.name,
+            "grades": grades
+        }), 200
+        
+    except Exception as e:
+        app.logger.error(f"Error fetching grades: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
