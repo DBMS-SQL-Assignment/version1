@@ -65,6 +65,15 @@ def mark_grade_func():
     if current_user["role"]=="professor":
         return mark_grade()
     return jsonify({"error": "Unauthorized"}), 403
+
+@app.route("/api/assign_subject", methods=["POST"])
+@jwt_required()
+def assign_subject_func():
+    current_user = get_jwt_identity()
+    if current_user["role"]=="professor":
+        professor = Professor.query.filter_by(id=current_user["id"]).first()
+        return assign_subject(professor)
+    return jsonify({"error": "Unauthorized"}), 403
     
 # Student Routes
 
