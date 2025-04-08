@@ -22,7 +22,7 @@ class Student(db.Model):
     __tablename__ = 'students'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    reg_no = db.Column(db.Integer, unique=True, nullable=False)
+    reg_no = db.Column(db.Integer, unique=True, nullable=False, primary_key=True)
     roll_no = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
@@ -39,7 +39,7 @@ class Professor(db.Model):
     __tablename__ = 'professors'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    prof_id = db.Column(db.String(20), unique=True, nullable=False)
+    prof_id = db.Column(db.String(20), unique=True, nullable=False, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
 
@@ -54,7 +54,7 @@ class Assistant(db.Model):
     __tablename__ = 'assistants'
 
     id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
-    asst_id = db.Column(db.String(20), unique=True, nullable=False)
+    asst_id = db.Column(db.String(20), unique=True, nullable=False, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
 
